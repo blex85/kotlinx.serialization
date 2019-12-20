@@ -8,11 +8,12 @@ import kotlinx.serialization.internal.*
 import kotlin.reflect.*
 
 /**
- * Reified version of `serializer(type)`, provided for convenience.
+ * A reified version of `serializer(type)`, provided for convenience.
  * This method constructs the serializer for provided reified type [T].
  *
- * This method works with generic parameters for built-in serializable classes such as [List] and [Map].
- * User-defined generic classes are not supported for now.
+ * This method constructs serializer correctly even for generic classes,
+ * since [typeOf] intrinsic can provide such information.
+ * Therefore, it is recommended to use this method instead of [KClass.serializer].
  *
  * Example of usage:
  * ```
@@ -22,7 +23,7 @@ import kotlin.reflect.*
  * ```
  *
  * This is a computation-heavy call, so it is recommended to cache the result.
- * [typeOf] API currently does not work on Kotlin/JS.
+ * [typeOf] API currently does not work with user-defined generic classes on Kotlin/JS.
  */
 @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH")
 @ImplicitReflectionSerializer
@@ -33,8 +34,9 @@ public inline fun <reified T> serializer(): KSerializer<T> {
 /**
  * Method that constructs a serializer for the given [type].
  *
- * This method works with generic parameters for built-in serializable classes such as [List] and [Map].
- * User-defined generic classes are not supported for now.
+ * This method constructs serializer correctly even for generic classes,
+ * since [KType] contains such information.
+ * Therefore, it is recommended to use this method instead of [KClass.serializer].
  *
  * Example of usage:
  * ```
@@ -44,10 +46,10 @@ public inline fun <reified T> serializer(): KSerializer<T> {
  * ```
  *
  * This is a computation-heavy call, so it is recommended to cache the result.
- * [typeOf] API currently does not work on Kotlin/JS.
+ * [typeOf] API currently does not work with user-defined generic classes on Kotlin/JS.
  */
 @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH", "UNSUPPORTED")
-@ImplicitReflectionSerializer
+@UseExperimental(ImplicitReflectionSerializer::class)
 public fun serializer(type: KType): KSerializer<Any?> {
     fun serializerByKTypeImpl(type: KType): KSerializer<Any> {
         val rootClass = when (val t = type.classifier) {
@@ -71,7 +73,10 @@ public fun serializer(type: KType): KSerializer<Any?> {
                     Map.Entry::class -> MapEntrySerializer(args[0], args[1])
                     Pair::class -> PairSerializer(args[0], args[1])
                     Triple::class -> TripleSerializer(args[0], args[1], args[2])
-                    else -> throw UnsupportedOperationException("The only generic classes supported for now are standard collections, got class $rootClass")
+                    else -> requireNotNull(rootClass.invokeSerializerGetter(*args.toTypedArray())) {
+                        "Can't find a method to construct serializer for type ${rootClass.simpleName()}. " +
+                                "Make sure this class is marked as @Serializable or provide serializer explicitly."
+                    }
                 }
             }
         } as KSerializer<Any>
@@ -80,3 +85,6 @@ public fun serializer(type: KType): KSerializer<Any?> {
     val result = serializerByKTypeImpl(type)
     return if (type.isMarkedNullable) result.nullable else result as KSerializer<Any?>
 }
+
+@ImplicitReflectionSerializer
+internal expect fun <T : Any> KClass<T>.invokeSerializerGetter(vararg args: KSerializer<Any?>): KSerializer<T>?

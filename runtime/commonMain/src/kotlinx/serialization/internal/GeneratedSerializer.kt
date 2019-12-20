@@ -10,3 +10,9 @@ import kotlinx.serialization.*
 public interface GeneratedSerializer<T> : KSerializer<T> {
     fun childSerializers(): Array<KSerializer<*>>
 }
+
+@InternalSerializationApi
+@Deprecated("Inserted into generated code and should not be used directly", level = DeprecationLevel.HIDDEN)
+public interface SerializerFactory {
+    fun serializer(vararg typeParamsSerializers: KSerializer<*>): KSerializer<*>
+}

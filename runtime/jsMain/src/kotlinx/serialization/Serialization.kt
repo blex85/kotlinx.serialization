@@ -35,3 +35,7 @@ actual fun <T: Any, E: T?> ArrayList<E>.toNativeArray(eClass: KClass<T>): Array<
 internal actual fun Any.isInstanceOf(kclass: KClass<*>): Boolean = kclass.isInstance(this)
 
 internal actual fun <T : Any> KClass<T>.simpleName(): String? = simpleName
+
+internal actual fun <T : Any> KClass<T>.invokeSerializerGetter(vararg args: KSerializer<Any?>): KSerializer<T>? {
+    throw NotImplementedError("This method is not supported for Kotlin/JS yet. Please provide serializer explicitly.")
+}

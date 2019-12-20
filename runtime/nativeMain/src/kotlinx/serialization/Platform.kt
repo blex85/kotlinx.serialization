@@ -22,6 +22,18 @@ actual fun stringFromUtf8Bytes(bytes: ByteArray): String {
 @Deprecated("Inserted into generated code and should not be used directly", level = DeprecationLevel.HIDDEN)
 public annotation class SerializableWith(val serializer: KClass<out KSerializer<*>>)
 
+@Suppress(
+    "UNCHECKED_CAST",
+    "DEPRECATION_ERROR"
+)
+@UseExperimental(ExperimentalAssociatedObjects::class)
+internal actual fun <T : Any> KClass<T>.invokeSerializerGetter(vararg args: KSerializer<Any?>): KSerializer<T>? =
+    when (val assocObject = findAssociatedObject<SerializableWith>()) {
+        is KSerializer<*> -> assocObject as KSerializer<T>
+        is kotlinx.serialization.internal.SerializerFactory -> assocObject.serializer(*args) as KSerializer<T>
+        else -> null
+    }
+
 
 @Suppress(
     "UNCHECKED_CAST",
