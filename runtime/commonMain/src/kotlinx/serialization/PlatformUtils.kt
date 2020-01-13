@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
+ * Copyright 2017-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
  */
 
 package kotlinx.serialization
@@ -9,16 +9,14 @@ import kotlin.reflect.KClass
 
 /**
  * Retrieves a [KSerializer] for the given [KClass].
+ * Class must be annotated as `@Serializable` or be one of the built-in types.
  *
- * Class must be annotated as @Serializable or be one of the built-in types.
- * Class must have no generic parameters.
- *
- * This method may sometimes fail, see [ImplicitReflectionSerializer] documentation.
- *
- * To work with generic classes, prefer using `serializer(KType)` function.
+ * This method has all the restrictions implied by [ImplicitReflectionSerializer], i.e.,
+ * it will fail on an attempt to retrieve a serializer for generic class.
+ * For classes with type parameters please use `serializer(KType)` instead.
  */
 @ImplicitReflectionSerializer
-fun <T : Any> KClass<T>.serializer(): KSerializer<T> = compiledSerializer()
+public fun <T : Any> KClass<T>.serializer(): KSerializer<T> = compiledSerializer()
         ?: builtinSerializerOrNull()
         ?: throw SerializationException(
             "Can't locate argument-less serializer for class ${this.simpleName()}. " +
@@ -46,7 +44,7 @@ expect fun <T: Any, E: T?> ArrayList<E>.toNativeArray(eClass: KClass<T>): Array<
  * This check is a replacement for [KClass.isInstance] because on JVM it requires kotlin-reflect.jar in classpath (see KT-14720).
  *
  * On JS and Native, this function delegates to aforementioned [KClass.isInstance] since it is supported there out-of-the-box;
- * on JVM, it falls back to java.lang.Class.isInstance, which causes difference when applied to function types with big arity.
+ * on JVM, it falls back to `java.lang.Class.isInstance`, which causes difference when applied to function types with big arity.
  */
 internal expect fun Any.isInstanceOf(kclass: KClass<*>): Boolean
 

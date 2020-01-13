@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
+ * Copyright 2017-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
  */
 
 package kotlinx.serialization
@@ -8,7 +8,7 @@ import kotlinx.serialization.internal.*
 import kotlin.reflect.*
 
 /**
- * A reified version of `serializer(type)`, provided for convenience.
+ * A reified version of `serializer(type)`.
  * This method constructs the serializer for provided reified type [T].
  *
  * This method constructs serializer correctly even for generic classes,
