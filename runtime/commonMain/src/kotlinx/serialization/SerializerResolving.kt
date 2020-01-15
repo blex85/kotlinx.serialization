@@ -8,21 +8,16 @@ import kotlinx.serialization.internal.*
 import kotlin.reflect.*
 
 /**
- * A reified version of `serializer(type)`.
- * This method constructs the serializer for provided reified type [T].
- *
- * This method constructs serializer correctly even for generic classes,
- * since [typeOf] intrinsic can provide such information.
- * Therefore, it is recommended to use this method instead of [KClass.serializer].
+ * Creates a serializer for the provided reified type [T] with support of user-defined generic classes.
+ * This method is a reified version of `serializer(KType)`
  *
  * Example of usage:
  * ```
  * val map = mapOf(1 to listOf(listOf("1")))
- * val serializer = serializer<Map<Int, List<List<String>>>()
- * json.stringify(serializer, map)
+ * json.stringify(serializer(), map)
  * ```
  *
- * This is a computation-heavy call, so it is recommended to cache the result.
+ * This is a computation-heavy call, so it is recommended to cache its result.
  * [typeOf] API currently does not work with user-defined generic classes on Kotlin/JS.
  */
 @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH")
@@ -32,20 +27,17 @@ public inline fun <reified T> serializer(): KSerializer<T> {
 }
 
 /**
- * Method that constructs a serializer for the given [type].
- *
- * This method constructs serializer correctly even for generic classes,
- * since [KType] contains such information.
- * Therefore, it is recommended to use this method instead of [KClass.serializer].
+ * Creates a serializer for the given [type] with support of user-defined generic classes.
+ * [type] argument can be obtained with experimental [typeOf] method.
  *
  * Example of usage:
  * ```
  * val map = mapOf(1 to listOf(listOf("1")))
- * val serializer = serializer(typeOf<Map<Int, List<List<String>>>())
+ * val serializer = serializer(typeOf<Map<Int, List<List<String>>>>())
  * json.stringify(serializer, map)
  * ```
  *
- * This is a computation-heavy call, so it is recommended to cache the result.
+ * This is a computation-heavy call, so it is recommended to cache its result.
  * [typeOf] API currently does not work with user-defined generic classes on Kotlin/JS.
  */
 @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH", "UNSUPPORTED")

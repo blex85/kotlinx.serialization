@@ -12,10 +12,10 @@ public interface GeneratedSerializer<T> : KSerializer<T> {
 }
 
 /**
- * An internal interface which compiler plugin may sometimes add as a superinterface for objects
- * that can provide serializers (currently it is done for auto-generated companion objects of @Serializable classes with type parameters).
- * This interface is used mainly to overcome lack of reflection on Kotlin/Native
- * via internal mechanisms provided by its compiler (see @AssociatedObjectKey).
+ * An internal interface used by the compiler plugin for objects that are factories of typed serializers, for example
+ * for auto-generated companion objects for [Serializable] classes with type parameters.
+ *
+ * This interface is used to lookup and create serializers in K/N using [AssociatedObjectKey].
  * Should not be used in any user code. Please use generated `.serializer(kSerializer1, kSerializer2, ...)`
  * method on a companion or top-level `serializer(KType)` function.
  */

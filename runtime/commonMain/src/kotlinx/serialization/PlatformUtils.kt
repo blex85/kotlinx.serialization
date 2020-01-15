@@ -9,11 +9,11 @@ import kotlin.reflect.KClass
 
 /**
  * Retrieves a [KSerializer] for the given [KClass].
- * Class must be annotated as `@Serializable` or be one of the built-in types.
+ * The class must be annotated as `@Serializable` or be one of the built-in types.
  *
  * This method has all the restrictions implied by [ImplicitReflectionSerializer], i.e.,
  * it will fail on an attempt to retrieve a serializer for generic class.
- * For classes with type parameters please use `serializer(KType)` instead.
+ * For classes with type parameters `serializer(KType)` should be used instead.
  */
 @ImplicitReflectionSerializer
 public fun <T : Any> KClass<T>.serializer(): KSerializer<T> = compiledSerializer()
